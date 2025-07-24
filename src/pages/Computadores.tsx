@@ -3,11 +3,13 @@ import { AssetForm } from "@/components/AssetForm";
 import { AssetTable } from "@/components/AssetTable";
 import { Button } from "@/components/ui/button";
 import { Plus, Monitor } from "lucide-react";
+import { useComputadores } from "@/hooks/useAssets";
+import { useAuth } from "@/contexts/AuthContext";
 
 const computadorFields = [
   { name: "nome", label: "Nome do Equipamento", type: "text" as const, required: true, placeholder: "Ex: Notebook Dell Latitude" },
   { name: "patrimonio", label: "Número do Patrimônio", type: "text" as const, required: true, placeholder: "Ex: PAT001234" },
-  { name: "macAddress", label: "MAC Address", type: "text" as const, required: true, placeholder: "Ex: 00:1B:44:11:3A:B7" },
+  { name: "mac_address", label: "MAC Address", type: "text" as const, required: true, placeholder: "Ex: 00:1B:44:11:3A:B7" },
   { name: "localizacao", label: "Localização", type: "select" as const, required: true, options: ["Matriz", "Filial 1", "Filial 2", "Home Office", "Almoxarifado"] },
   { name: "responsavel", label: "Responsável", type: "text" as const, required: true, placeholder: "Nome do usuário responsável" },
   { name: "setor", label: "Setor", type: "select" as const, required: true, options: ["TI", "Administrativo", "Vendas", "Marketing", "RH", "Financeiro"] },
@@ -27,51 +29,24 @@ const tableColumns = [
   { key: "status", label: "Status", type: "status" as const }
 ];
 
-const mockData = [
-  {
-    nome: "Notebook Dell Latitude 5520",
-    patrimonio: "PAT001234",
-    macAddress: "00:1B:44:11:3A:B7",
-    localizacao: "Matriz",
-    responsavel: "João Silva",
-    setor: "TI",
-    status: "Ativo",
-    marca: "Dell Latitude 5520",
-    processador: "Intel Core i5-1135G7",
-    memoria: "8GB DDR4",
-    armazenamento: "SSD 256GB"
-  },
-  {
-    nome: "Desktop HP ProDesk 400",
-    patrimonio: "PAT001235",
-    macAddress: "00:1B:44:11:3A:B8",
-    localizacao: "Filial 1",
-    responsavel: "Maria Santos",
-    setor: "Administrativo",
-    status: "Ativo",
-    marca: "HP ProDesk 400",
-    processador: "Intel Core i3-10100",
-    memoria: "4GB DDR4",
-    armazenamento: "HDD 500GB"
-  }
-];
-
 export default function Computadores() {
   const [showForm, setShowForm] = useState(false);
-  const [computadores, setComputadores] = useState(mockData);
+  const { computadores, isLoading, createComputador, deleteComputador } = useComputadores();
+  const { isAdmin } = useAuth();
 
-  const handleSubmit = (data: Record<string, string>) => {
-    const novoComputador = data as any;
-    setComputadores(prev => [...prev, novoComputador]);
-    setShowForm(false);
+  const handleSubmit = async (data: Record<string, string>) => {
+    const result = await createComputador(data);
+    if (result.success) {
+      setShowForm(false);
+    }
   };
 
   const handleEdit = (computador: any) => {
     console.log("Editar:", computador);
   };
 
-  const handleDelete = (computador: any) => {
-    setComputadores(prev => prev.filter(c => c.patrimonio !== computador.patrimonio));
+  const handleDelete = async (computador: any) => {
+    await deleteComputador(computador.id);
   };
 
   const handleView = (computador: any) => {
@@ -92,17 +67,19 @@ export default function Computadores() {
           </p>
         </div>
         
-        <Button 
-          onClick={() => setShowForm(!showForm)} 
-          variant="tech"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Computador
-        </Button>
+        {isAdmin && (
+          <Button 
+            onClick={() => setShowForm(!showForm)} 
+            variant="tech"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Computador
+          </Button>
+        )}
       </div>
 
       {/* Formulário de Cadastro */}
-      {showForm && (
+      {showForm && isAdmin && (
         <AssetForm
           title="Cadastrar Novo Computador"
           fields={computadorFields}
@@ -116,8 +93,8 @@ export default function Computadores() {
         title="Lista de Computadores"
         data={computadores}
         columns={tableColumns}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        onEdit={isAdmin ? handleEdit : undefined}
+        onDelete={isAdmin ? handleDelete : undefined}
         onView={handleView}
       />
     </div>

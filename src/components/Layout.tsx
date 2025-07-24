@@ -13,11 +13,11 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 
 export function Layout() {
-  const { user, logout } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/login');
   };
 
@@ -53,7 +53,7 @@ export function Layout() {
                       <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                         <User className="w-4 h-4 text-primary-foreground" />
                       </div>
-                      <span className="hidden md:block font-medium">{user?.username}</span>
+                      <span className="hidden md:block font-medium">{profile?.full_name || user?.email}</span>
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">

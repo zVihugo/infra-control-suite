@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { MetricCard } from "@/components/MetricCard";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,77 +10,25 @@ import {
   TrendingUp,
   Activity,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Users
 } from "lucide-react";
-
-interface AssetMetrics {
-  computadores: number;
-  celulares: number;
-  switches: number;
-  accessPoints: number;
-  coletores: number;
-}
+import { useAssetCounts } from "@/hooks/useAssets";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Dashboard() {
-  const [metrics, setMetrics] = useState<AssetMetrics>({
-    computadores: 0,
-    celulares: 0,
-    switches: 0,
-    accessPoints: 0,
-    coletores: 0
-  });
+  const { counts, isLoading } = useAssetCounts();
+  const { profile, isAdmin } = useAuth();
 
-  // Simulação de dados dinâmicos
-  useEffect(() => {
-    const loadMetrics = () => {
-      // Simular carregamento de dados
-      setTimeout(() => {
-        setMetrics({
-          computadores: 45,
-          celulares: 32,
-          switches: 12,
-          accessPoints: 28,
-          coletores: 15
-        });
-      }, 500);
-    };
-
-    loadMetrics();
-  }, []);
-
-  const totalAssets = Object.values(metrics).reduce((sum, value) => sum + value, 0);
+  const totalAssets = Object.values(counts).reduce((sum, value) => sum + value, 0);
 
   const recentActivities = [
     {
       id: 1,
-      action: "Novo computador cadastrado",
-      asset: "Notebook Dell Latitude 5520",
-      user: "João Silva",
-      time: "há 2 horas",
-      type: "create"
-    },
-    {
-      id: 2,
-      action: "Switch atualizado",
-      asset: "Switch Cisco SG300-28",
-      user: "Maria Santos",
-      time: "há 4 horas",
-      type: "update"
-    },
-    {
-      id: 3,
-      action: "Celular removido",
-      asset: "iPhone 12 Pro",
-      user: "Pedro Costa",
-      time: "há 6 horas",
-      type: "delete"
-    },
-    {
-      id: 4,
-      action: "Access Point instalado",
-      asset: "Ubiquiti UniFi AP",
-      user: "Ana Oliveira",
-      time: "há 1 dia",
+      action: "Sistema inicializado",
+      asset: "Dashboard principal",
+      user: profile?.full_name || "Sistema",
+      time: "agora",
       type: "create"
     }
   ];
@@ -102,13 +49,28 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col space-y-2">
-        <h1 className="text-4xl font-bold text-foreground glow-text">
-          Dashboard de Ativos de TI
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Visão geral e controle centralizado dos recursos tecnológicos
-        </p>
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-foreground glow-text">
+            Dashboard de Ativos de TI
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Visão geral e controle centralizado dos recursos tecnológicos
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          <Card className="border-border/50 bg-card/50">
+            <div className="p-4">
+              <div className="flex items-center space-x-2">
+                <Users className="w-5 h-5 text-primary" />
+                <span className="text-sm font-medium">
+                  Perfil: {isAdmin ? 'Administrador' : 'Usuário'}
+                </span>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
 
       {/* Métricas Principais */}
@@ -117,10 +79,9 @@ export default function Dashboard() {
         <div className="xl:col-span-2">
           <MetricCard
             title="Total de Ativos"
-            value={totalAssets}
+            value={isLoading ? 0 : totalAssets}
             icon={Package}
-            change={12}
-            description="Crescimento mensal"
+            description="Total de dispositivos"
             color="primary"
           />
         </div>
@@ -128,36 +89,32 @@ export default function Dashboard() {
         {/* Métricas por Categoria */}
         <MetricCard
           title="Computadores"
-          value={metrics.computadores}
+          value={isLoading ? 0 : counts.computadores}
           icon={Monitor}
-          change={8}
           description="Desktops e Notebooks"
           color="primary"
         />
 
         <MetricCard
           title="Celulares"
-          value={metrics.celulares}
+          value={isLoading ? 0 : counts.celulares}
           icon={Smartphone}
-          change={-2}
           description="Smartphones corporativos"
           color="accent"
         />
 
         <MetricCard
           title="Switches"
-          value={metrics.switches}
+          value={isLoading ? 0 : counts.switches}
           icon={Network}
-          change={5}
           description="Equipamentos de rede"
           color="secondary"
         />
 
         <MetricCard
           title="Access Points"
-          value={metrics.accessPoints}
+          value={isLoading ? 0 : counts.accessPoints}
           icon={Wifi}
-          change={15}
           description="Pontos de acesso Wi-Fi"
           color="accent"
         />
@@ -175,11 +132,11 @@ export default function Dashboard() {
 
             <div className="space-y-4">
               {[
-                { name: "Computadores", value: metrics.computadores, color: "bg-primary", total: totalAssets },
-                { name: "Access Points", value: metrics.accessPoints, color: "bg-accent", total: totalAssets },
-                { name: "Celulares", value: metrics.celulares, color: "bg-blue-500", total: totalAssets },
-                { name: "Coletores", value: metrics.coletores, color: "bg-green-500", total: totalAssets },
-                { name: "Switches", value: metrics.switches, color: "bg-purple-500", total: totalAssets }
+                { name: "Computadores", value: counts.computadores, color: "bg-primary", total: totalAssets },
+                { name: "Access Points", value: counts.accessPoints, color: "bg-accent", total: totalAssets },
+                { name: "Celulares", value: counts.celulares, color: "bg-blue-500", total: totalAssets },
+                { name: "Coletores", value: counts.coletores, color: "bg-green-500", total: totalAssets },
+                { name: "Switches", value: counts.switches, color: "bg-purple-500", total: totalAssets }
               ].map((item) => {
                 const percentage = totalAssets > 0 ? (item.value / item.total) * 100 : 0;
                 return (
@@ -235,9 +192,9 @@ export default function Dashboard() {
           </div>
 
           <div className="mt-4 pt-4 border-t border-border">
-            <button className="w-full text-sm text-primary hover:text-primary/80 font-medium transition-colors">
-              Ver todas as atividades
-            </button>
+            <div className="text-center text-sm text-muted-foreground">
+              {isAdmin ? 'Todas as operações estão disponíveis' : 'Modo somente leitura'}
+            </div>
           </div>
         </Card>
       </div>

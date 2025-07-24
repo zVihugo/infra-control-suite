@@ -14,16 +14,336 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      access_points: {
+        Row: {
+          banda: string | null
+          canal: string | null
+          created_at: string
+          created_by: string | null
+          data_instalacao: string | null
+          id: string
+          ip_acesso: string
+          localizacao: string
+          mac_address: string
+          marca: string
+          observacoes: string | null
+          padrao: string | null
+          patrimonio: string | null
+          potencia: string | null
+          ssid: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          banda?: string | null
+          canal?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_instalacao?: string | null
+          id?: string
+          ip_acesso: string
+          localizacao: string
+          mac_address: string
+          marca: string
+          observacoes?: string | null
+          padrao?: string | null
+          patrimonio?: string | null
+          potencia?: string | null
+          ssid: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          banda?: string | null
+          canal?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_instalacao?: string | null
+          id?: string
+          ip_acesso?: string
+          localizacao?: string
+          mac_address?: string
+          marca?: string
+          observacoes?: string | null
+          padrao?: string | null
+          patrimonio?: string | null
+          potencia?: string | null
+          ssid?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      celulares: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data_aquisicao: string | null
+          id: string
+          imei: string
+          marca: string
+          numero: string
+          observacoes: string | null
+          operadora: string | null
+          patrimonio: string | null
+          plano: string | null
+          responsavel: string
+          setor: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data_aquisicao?: string | null
+          id?: string
+          imei: string
+          marca: string
+          numero: string
+          observacoes?: string | null
+          operadora?: string | null
+          patrimonio?: string | null
+          plano?: string | null
+          responsavel: string
+          setor: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data_aquisicao?: string | null
+          id?: string
+          imei?: string
+          marca?: string
+          numero?: string
+          observacoes?: string | null
+          operadora?: string | null
+          patrimonio?: string | null
+          plano?: string | null
+          responsavel?: string
+          setor?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      coletores: {
+        Row: {
+          conectividade: string | null
+          created_at: string
+          created_by: string | null
+          data_aquisicao: string | null
+          id: string
+          localizacao: string
+          marca: string
+          observacoes: string | null
+          patrimonio: string | null
+          responsavel: string
+          serie: string
+          sistema_operacional: string | null
+          status: string
+          tipo: string | null
+          updated_at: string
+          versao_software: string | null
+        }
+        Insert: {
+          conectividade?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_aquisicao?: string | null
+          id?: string
+          localizacao: string
+          marca: string
+          observacoes?: string | null
+          patrimonio?: string | null
+          responsavel: string
+          serie: string
+          sistema_operacional?: string | null
+          status?: string
+          tipo?: string | null
+          updated_at?: string
+          versao_software?: string | null
+        }
+        Update: {
+          conectividade?: string | null
+          created_at?: string
+          created_by?: string | null
+          data_aquisicao?: string | null
+          id?: string
+          localizacao?: string
+          marca?: string
+          observacoes?: string | null
+          patrimonio?: string | null
+          responsavel?: string
+          serie?: string
+          sistema_operacional?: string | null
+          status?: string
+          tipo?: string | null
+          updated_at?: string
+          versao_software?: string | null
+        }
+        Relationships: []
+      }
+      computadores: {
+        Row: {
+          armazenamento: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          localizacao: string
+          mac_address: string
+          marca: string | null
+          memoria: string | null
+          nome: string
+          observacoes: string | null
+          patrimonio: string
+          processador: string | null
+          responsavel: string
+          setor: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          armazenamento?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          localizacao: string
+          mac_address: string
+          marca?: string | null
+          memoria?: string | null
+          nome: string
+          observacoes?: string | null
+          patrimonio: string
+          processador?: string | null
+          responsavel: string
+          setor: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          armazenamento?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          localizacao?: string
+          mac_address?: string
+          marca?: string | null
+          memoria?: string | null
+          nome?: string
+          observacoes?: string | null
+          patrimonio?: string
+          processador?: string | null
+          responsavel?: string
+          setor?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      switches: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data_instalacao: string | null
+          id: string
+          ip_acesso: string
+          localizacao: string
+          mac_address: string
+          marca: string
+          numero_portas: string
+          observacoes: string | null
+          patrimonio: string | null
+          protocolo: string | null
+          status: string
+          updated_at: string
+          velocidade: string | null
+          versao_firmware: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data_instalacao?: string | null
+          id?: string
+          ip_acesso: string
+          localizacao: string
+          mac_address: string
+          marca: string
+          numero_portas: string
+          observacoes?: string | null
+          patrimonio?: string | null
+          protocolo?: string | null
+          status?: string
+          updated_at?: string
+          velocidade?: string | null
+          versao_firmware?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data_instalacao?: string | null
+          id?: string
+          ip_acesso?: string
+          localizacao?: string
+          mac_address?: string
+          marca?: string
+          numero_portas?: string
+          observacoes?: string | null
+          patrimonio?: string | null
+          protocolo?: string | null
+          status?: string
+          updated_at?: string
+          velocidade?: string | null
+          versao_firmware?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +470,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

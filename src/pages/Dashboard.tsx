@@ -49,7 +49,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header */}
+     
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
           <h1 className="text-4xl font-bold text-foreground glow-text">

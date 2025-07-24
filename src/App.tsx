@@ -26,11 +26,11 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            {/* Public Routes */}
+           
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* Protected Routes */}
+         
             <Route path="/" element={
               <ProtectedRoute>
                 <Layout />
@@ -44,7 +44,7 @@ const App = () => (
               <Route path="coletores" element={<Coletores />} />
             </Route>
             
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+           
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

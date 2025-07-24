@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AssetForm } from "@/components/AssetForm";
 import { AssetTable } from "@/components/AssetTable";
 import { Button } from "@/components/ui/button";
 import { Plus, Monitor } from "lucide-react";
+
 import { useComputadores } from "@/hooks/useAssets";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -31,26 +32,71 @@ const tableColumns = [
 
 export default function Computadores() {
   const [showForm, setShowForm] = useState(false);
-  const { computadores, isLoading, createComputador, deleteComputador } = useComputadores();
+  const [editingComputador, setEditingComputador] = useState<any>(null);
+  const { computadores, isLoading, createComputador, updateComputador, deleteComputador, refetch } = useComputadores();
   const { isAdmin } = useAuth();
 
   const handleSubmit = async (data: Record<string, string>) => {
-    const result = await createComputador(data);
-    if (result.success) {
-      setShowForm(false);
+    if (editingComputador) {
+      // Atualizar computador existente
+      const result = await updateComputador(editingComputador.id, data);
+      if (result.success) {
+        setShowForm(false);
+        setEditingComputador(null);
+      }
+    } else {
+      // Criar novo computador
+      const result = await createComputador(data);
+      if (result.success) {
+        setShowForm(false);
+      }
     }
   };
 
   const handleEdit = (computador: any) => {
-    console.log("Editar:", computador);
+    if (!isAdmin) return;
+    
+    // Mapear os dados para o formato do formulário
+    const formData = {
+      nome: computador.nome,
+      patrimonio: computador.patrimonio,
+      mac_address: computador.mac_address,
+      localizacao: computador.localizacao,
+      responsavel: computador.responsavel,
+      setor: computador.setor,
+      status: computador.status,
+      marca: computador.marca || '',
+      processador: computador.processador || '',
+      memoria: computador.memoria || '',
+      armazenamento: computador.armazenamento || '',
+      observacoes: computador.observacoes || ''
+    };
+    
+    setEditingComputador({ ...computador, ...formData });
+    setShowForm(true);
   };
 
   const handleDelete = async (computador: any) => {
-    await deleteComputador(computador.id);
+    if (!isAdmin) return;
+    
+    if (window.confirm(`Tem certeza que deseja remover o computador ${computador.nome}?`)) {
+      await deleteComputador(computador.id);
+    }
   };
 
   const handleView = (computador: any) => {
     console.log("Visualizar:", computador);
+  };
+
+  const handleNewComputador = () => {
+    if (!isAdmin) return;
+    setEditingComputador(null);
+    setShowForm(true);
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingComputador(null);
   };
 
   return (
@@ -69,7 +115,7 @@ export default function Computadores() {
         
         {isAdmin && (
           <Button 
-            onClick={() => setShowForm(!showForm)} 
+            onClick={handleNewComputador} 
             variant="tech"
           >
             <Plus className="w-4 h-4 mr-2" />
@@ -81,22 +127,29 @@ export default function Computadores() {
       {/* Formulário de Cadastro */}
       {showForm && isAdmin && (
         <AssetForm
-          title="Cadastrar Novo Computador"
+          title={editingComputador ? "Editar Computador" : "Cadastrar Novo Computador"}
           fields={computadorFields}
+          initialData={editingComputador}
           onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
+          onCancel={handleCancel}
         />
       )}
 
       {/* Tabela de Computadores */}
-      <AssetTable
-        title="Lista de Computadores"
-        data={computadores}
-        columns={tableColumns}
-        onEdit={isAdmin ? handleEdit : undefined}
-        onDelete={isAdmin ? handleDelete : undefined}
-        onView={handleView}
-      />
+      {isLoading ? (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <AssetTable
+          title="Lista de Computadores"
+          data={computadores}
+          columns={tableColumns}
+          onEdit={isAdmin ? handleEdit : undefined}
+          onDelete={isAdmin ? handleDelete : undefined}
+          onView={handleView}
+        />
+      )}
     </div>
   );
 }

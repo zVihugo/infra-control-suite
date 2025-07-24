@@ -3,6 +3,8 @@ import { AssetForm } from "@/components/AssetForm";
 import { AssetTable } from "@/components/AssetTable";
 import { Button } from "@/components/ui/button";
 import { Plus, Package } from "lucide-react";
+import { useColetores } from "@/hooks/useAssets";
+import { useAuth } from "@/contexts/AuthContext";
 
 const coletorFields = [
   { name: "marca", label: "Marca/Modelo", type: "text" as const, required: true, placeholder: "Ex: Zebra MC3300" },
@@ -13,9 +15,9 @@ const coletorFields = [
   { name: "patrimonio", label: "Patrimônio", type: "text" as const, placeholder: "Ex: COL001234" },
   { name: "tipo", label: "Tipo de Coletor", type: "select" as const, options: ["Código de Barras", "RFID", "Híbrido"] },
   { name: "conectividade", label: "Conectividade", type: "select" as const, options: ["Wi-Fi", "Bluetooth", "4G", "Wi-Fi + Bluetooth", "Wi-Fi + 4G"] },
-  { name: "sistemaOperacional", label: "Sistema Operacional", type: "select" as const, options: ["Android", "Windows CE", "Windows Mobile", "Proprietário"] },
-  { name: "versaoSoftware", label: "Versão do Software", type: "text" as const, placeholder: "Ex: v2.1.5" },
-  { name: "dataAquisicao", label: "Data de Aquisição", type: "text" as const, placeholder: "DD/MM/AAAA" },
+  { name: "sistema_operacional", label: "Sistema Operacional", type: "select" as const, options: ["Android", "Windows CE", "Windows Mobile", "Proprietário"] },
+  { name: "versao_software", label: "Versão do Software", type: "text" as const, placeholder: "Ex: v2.1.5" },
+  { name: "data_aquisicao", label: "Data de Aquisição", type: "text" as const, placeholder: "DD/MM/AAAA" },
   { name: "observacoes", label: "Observações", type: "textarea" as const, placeholder: "Configurações especiais, aplicativos instalados..." }
 ];
 
@@ -27,54 +29,88 @@ const tableColumns = [
   { key: "status", label: "Status", type: "status" as const }
 ];
 
-const mockData = [
-  {
-    marca: "Zebra MC3300",
-    serie: "12345678901",
-    responsavel: "José Santos",
-    status: "Ativo",
-    localizacao: "Almoxarifado",
-    patrimonio: "COL001234",
-    tipo: "Código de Barras",
-    conectividade: "Wi-Fi + Bluetooth",
-    sistemaOperacional: "Android",
-    versaoSoftware: "v2.1.5"
-  },
-  {
-    marca: "Honeywell CT60",
-    serie: "12345678902",
-    responsavel: "Maria Oliveira",
-    status: "Ativo",
-    localizacao: "Expedição",
-    patrimonio: "COL001235",
-    tipo: "RFID",
-    conectividade: "Wi-Fi + 4G",
-    sistemaOperacional: "Android",
-    versaoSoftware: "v1.8.2"
-  }
-];
-
 export default function Coletores() {
   const [showForm, setShowForm] = useState(false);
-  const [coletores, setColetores] = useState(mockData);
+  const [editingColetor, setEditingColetor] = useState<any>(null);
+  const { coletores, isLoading, createColetor, updateColetor, deleteColetor } = useColetores();
+  const { isAdmin } = useAuth();
 
-  const handleSubmit = (data: Record<string, string>) => {
-    const novoColetor = data as any;
-    setColetores(prev => [...prev, novoColetor]);
-    setShowForm(false);
+  const handleSubmit = async (data: Record<string, string>) => {
+    if (editingColetor) {
+      // Atualizar coletor existente
+      const result = await updateColetor(editingColetor.id, data);
+      if (result.success) {
+        setShowForm(false);
+        setEditingColetor(null);
+      }
+    } else {
+      // Criar novo coletor
+      const result = await createColetor(data);
+      if (result.success) {
+        setShowForm(false);
+      }
+    }
   };
 
   const handleEdit = (coletor: any) => {
-    console.log("Editar:", coletor);
+    if (!isAdmin) {
+      return; // Apenas admins podem editar
+    }
+    
+    // Mapear os campos da tabela para o formato do formulário
+    const formData = {
+      marca: coletor.marca,
+      serie: coletor.serie,
+      responsavel: coletor.responsavel,
+      status: coletor.status,
+      localizacao: coletor.localizacao,
+      patrimonio: coletor.patrimonio || '',
+      tipo: coletor.tipo || '',
+      conectividade: coletor.conectividade || '',
+      sistema_operacional: coletor.sistema_operacional || '',
+      versao_software: coletor.versao_software || '',
+      data_aquisicao: coletor.data_aquisicao || '',
+      observacoes: coletor.observacoes || ''
+    };
+    
+    setEditingColetor({ ...coletor, ...formData });
+    setShowForm(true);
   };
 
-  const handleDelete = (coletor: any) => {
-    setColetores(prev => prev.filter(c => c.serie !== coletor.serie));
+  const handleDelete = async (coletor: any) => {
+    if (!isAdmin) {
+      return; // Apenas admins podem deletar
+    }
+    
+    if (window.confirm(`Tem certeza que deseja remover o coletor ${coletor.marca}?`)) {
+      await deleteColetor(coletor.id);
+    }
   };
 
   const handleView = (coletor: any) => {
     console.log("Visualizar:", coletor);
   };
+
+  const handleNewColetor = () => {
+    if (!isAdmin) {
+      return; // Apenas admins podem criar
+    }
+    setEditingColetor(null);
+    setShowForm(true);
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingColetor(null);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-lg">Carregando coletores...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -90,22 +126,25 @@ export default function Coletores() {
           </p>
         </div>
         
-        <Button 
-          onClick={() => setShowForm(!showForm)} 
-          variant="tech"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Coletor
-        </Button>
+        {isAdmin && (
+          <Button 
+            onClick={handleNewColetor} 
+            variant="tech"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Coletor
+          </Button>
+        )}
       </div>
 
       {/* Formulário de Cadastro */}
       {showForm && (
         <AssetForm
-          title="Cadastrar Novo Coletor"
+          title={editingColetor ? "Editar Coletor" : "Cadastrar Novo Coletor"}
           fields={coletorFields}
+          initialData={editingColetor}
           onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
+          onCancel={handleCancel}
         />
       )}
 
@@ -114,8 +153,8 @@ export default function Coletores() {
         title="Lista de Coletores"
         data={coletores}
         columns={tableColumns}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        onEdit={isAdmin ? handleEdit : undefined}
+        onDelete={isAdmin ? handleDelete : undefined}
         onView={handleView}
       />
     </div>

@@ -118,6 +118,14 @@ export default function Dashboard() {
           description="Pontos de acesso Wi-Fi"
           color="accent"
         />
+
+          <MetricCard
+          title="Coletores"
+          value={isLoading ? 0 : counts.coletores}
+          icon={Wifi}
+          description="Coletores de dados"
+          color="accent"
+        />
       </div>
 
       {/* Seção Inferior - Gráficos e Atividades */}

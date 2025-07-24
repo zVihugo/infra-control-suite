@@ -37,7 +37,7 @@ export default function Login() {
         variant: "destructive"
       });
     } else {
-      navigate('/dashboard');
+      navigate('/');
     }
     
     setIsLoading(false);

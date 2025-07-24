@@ -23,11 +23,11 @@ interface AssetFormProps {
   fields: FormField[];
   onSubmit: (data: Record<string, string>) => void;
   onCancel?: () => void;
-  initialData?: Record<string, string>;
+  initialData?: Record<string, string> | null;
 }
 
-export function AssetForm({ title, fields, onSubmit, onCancel, initialData = {} }: AssetFormProps) {
-  const [formData, setFormData] = useState<Record<string, string>>(initialData);
+export function AssetForm({ title, fields, onSubmit, onCancel, initialData }: AssetFormProps) {
+  const [formData, setFormData] = useState<Record<string, string>>(initialData || {});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 

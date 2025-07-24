@@ -3,6 +3,8 @@ import { AssetForm } from "@/components/AssetForm";
 import { AssetTable } from "@/components/AssetTable";
 import { Button } from "@/components/ui/button";
 import { Plus, Smartphone } from "lucide-react";
+import { useCelulares } from "@/hooks/useAssets";
+import { useAuth } from "@/contexts/AuthContext";
 
 const celularFields = [
   { name: "marca", label: "Marca/Modelo", type: "text" as const, required: true, placeholder: "Ex: iPhone 13 Pro" },
@@ -26,51 +28,78 @@ const tableColumns = [
   { key: "status", label: "Status", type: "status" as const }
 ];
 
-const mockData = [
-  {
-    marca: "iPhone 13 Pro",
-    numero: "(11) 99999-1234",
-    imei: "123456789012345",
-    responsavel: "Carlos Silva",
-    setor: "Vendas",
-    status: "Ativo",
-    operadora: "Vivo",
-    plano: "Controle 15GB",
-    patrimonio: "CEL001234"
-  },
-  {
-    marca: "Samsung Galaxy S21",
-    numero: "(11) 99999-5678",
-    imei: "123456789012346",
-    responsavel: "Ana Costa",
-    setor: "Marketing",
-    status: "Ativo",
-    operadora: "Claro",
-    plano: "Pós 20GB",
-    patrimonio: "CEL001235"
-  }
-];
-
 export default function Celulares() {
   const [showForm, setShowForm] = useState(false);
-  const [celulares, setCelulares] = useState(mockData);
+  const [editingCelular, setEditingCelular] = useState<any>(null);
+  const { celulares, isLoading, createCelular, updateCelular, deleteCelular } = useCelulares();
+  const { isAdmin } = useAuth();
 
-  const handleSubmit = (data: Record<string, string>) => {
-    const novoCelular = data as any;
-    setCelulares(prev => [...prev, novoCelular]);
-    setShowForm(false);
+  const handleSubmit = async (data: Record<string, string>) => {
+    if (editingCelular) {
+      // Atualizar celular existente
+      const result = await updateCelular(editingCelular.id, data);
+      if (result.success) {
+        setShowForm(false);
+        setEditingCelular(null);
+      }
+    } else {
+      // Criar novo celular
+      const result = await createCelular(data);
+      if (result.success) {
+        setShowForm(false);
+      }
+    }
   };
 
   const handleEdit = (celular: any) => {
-    console.log("Editar:", celular);
+    if (!isAdmin) {
+      return; // Apenas admins podem editar
+    }
+    
+    // Mapear os campos da tabela para o formato do formulário
+    const formData = {
+      marca: celular.marca,
+      numero: celular.numero,
+      imei: celular.imei,
+      responsavel: celular.responsavel,
+      setor: celular.setor,
+      status: celular.status,
+      operadora: celular.operadora || '',
+      plano: celular.plano || '',
+      patrimonio: celular.patrimonio || '',
+      dataAquisicao: celular.data_aquisicao || '',
+      observacoes: celular.observacoes || ''
+    };
+    
+    setEditingCelular({ ...celular, ...formData });
+    setShowForm(true);
   };
 
-  const handleDelete = (celular: any) => {
-    setCelulares(prev => prev.filter(c => c.imei !== celular.imei));
+  const handleDelete = async (celular: any) => {
+    if (!isAdmin) {
+      return; // Apenas admins podem deletar
+    }
+    
+    if (window.confirm(`Tem certeza que deseja remover o celular ${celular.marca}?`)) {
+      await deleteCelular(celular.id);
+    }
   };
 
   const handleView = (celular: any) => {
     console.log("Visualizar:", celular);
+  };
+
+  const handleNewCelular = () => {
+    if (!isAdmin) {
+      return; // Apenas admins podem criar
+    }
+    setEditingCelular(null);
+    setShowForm(true);
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingCelular(null);
   };
 
   return (
@@ -87,34 +116,43 @@ export default function Celulares() {
           </p>
         </div>
         
-        <Button 
-          onClick={() => setShowForm(!showForm)} 
-          variant="tech"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Novo Celular
-        </Button>
+        {isAdmin && (
+          <Button 
+            onClick={handleNewCelular} 
+            variant="tech"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Novo Celular
+          </Button>
+        )}
       </div>
 
       {/* Formulário de Cadastro */}
-      {showForm && (
+      {showForm && isAdmin && (
         <AssetForm
-          title="Cadastrar Novo Celular"
+          title={editingCelular ? "Editar Celular" : "Cadastrar Novo Celular"}
           fields={celularFields}
+          initialData={editingCelular}
           onSubmit={handleSubmit}
-          onCancel={() => setShowForm(false)}
+          onCancel={handleCancel}
         />
       )}
 
       {/* Tabela de Celulares */}
-      <AssetTable
-        title="Lista de Celulares"
-        data={celulares}
-        columns={tableColumns}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onView={handleView}
-      />
+      {isLoading ? (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      ) : (
+        <AssetTable
+          title="Lista de Celulares"
+          data={celulares}
+          columns={tableColumns}
+          onEdit={isAdmin ? handleEdit : undefined}
+          onDelete={isAdmin ? handleDelete : undefined}
+          onView={handleView}
+        />
+      )}
     </div>
   );
 }

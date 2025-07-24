@@ -1,6 +1,7 @@
 import { MetricCard } from "@/components/MetricCard";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { 
   Monitor, 
   Smartphone, 
@@ -60,6 +61,7 @@ export default function Dashboard() {
         </div>
         
         <div className="flex items-center space-x-4">
+          <ThemeToggle />
           <Card className="border-border/50 bg-card/50">
             <div className="p-4">
               <div className="flex items-center space-x-2">
@@ -73,9 +75,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Métricas Principais */}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
-        {/* Total de Ativos */}
+        
         <div className="xl:col-span-2">
           <MetricCard
             title="Total de Ativos"

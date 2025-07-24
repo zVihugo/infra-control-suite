@@ -124,7 +124,7 @@ export default function Computadores() {
         )}
       </div>
 
-      {/* Formulário de Cadastro */}
+      
       {showForm && isAdmin && (
         <AssetForm
           title={editingComputador ? "Editar Computador" : "Cadastrar Novo Computador"}

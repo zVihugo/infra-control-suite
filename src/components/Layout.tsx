@@ -3,6 +3,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Bell, Settings, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +39,9 @@ export function Layout() {
               </div>
               
               <div className="flex items-center space-x-4">
+                {/* Toggle de Tema */}
+                <ThemeToggle />
+                
                 {/* Notificações */}
                 <Button variant="ghost" size="sm" className="relative">
                   <Bell className="w-5 h-5" />

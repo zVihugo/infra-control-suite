@@ -1,73 +1,41 @@
-# Welcome to your Lovable project
+# 💻 Sistema de Gerenciamento de Ativos de TI
 
-## Project info
+Este projeto é uma aplicação web para controle e visualização de ativos de tecnologia da informação, como computadores, celulares, switches, access points e coletores. Utiliza autenticação e banco de dados com **Supabase** e foi desenvolvido com foco em uma interface fluida, moderna e responsiva.
 
-**URL**: https://lovable.dev/projects/cf5c8826-6cef-4d74-9420-b10e6522919b
+## 🚀 Funcionalidades
 
-## How can I edit this code?
+- ✅ Login e Registro de usuários (via Supabase Auth)
+- 🔐 Controle de permissões por **papéis de usuário** (`admin` e `user`)
+- 📊 Dashboard dinâmico com contagem total de ativos
+- 🖥️ Cadastro e listagem de:
+  - Computadores
+  - Celulares
+  - Switches
+  - Access Points (APs)
+  - Coletores
+- ✏️ Admins podem adicionar, editar e deletar ativos
+- 👀 Usuários comuns podem apenas visualizar os ativos
+- 🧠 Dados reais armazenados e consultados dinamicamente via Supabase
+- 📅 Atualização automática de timestamps nas alterações
 
-There are several ways of editing your application.
+## 🧰 Tecnologias Utilizadas
 
-**Use Lovable**
+- [React.js](https://reactjs.org/)
+- [Supabase](https://supabase.com/) (Auth + Database + RLS)
+- [Chakra UI](https://chakra-ui.com/) ou outro framework de UI (caso aplicável)
+- [TypeScript](https://www.typescriptlang.org/) (opcional)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/cf5c8826-6cef-4d74-9420-b10e6522919b) and start prompting.
+## 🛡️ Controle de Acesso
 
-Changes made via Lovable will be committed automatically to this repo.
+Utiliza Row Level Security (RLS) do Supabase com funções e políticas para garantir:
 
-**Use your preferred IDE**
+| Ação               | Admin | Usuário Comum |
+|--------------------|:-----:|:-------------:|
+| Visualizar ativos  | ✅    | ✅            |
+| Cadastrar ativos   | ✅    | ❌            |
+| Editar ativos      | ✅    | ❌            |
+| Deletar ativos     | ✅    | ❌            |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+🌐 Link do Deploy
+https://infra-control-suite.lovable.app/login
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/cf5c8826-6cef-4d74-9420-b10e6522919b) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
